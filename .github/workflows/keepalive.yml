@@ -1,1 +1,32 @@
+name: Keep Alive
+
+on:
+  schedule:
+    # Run every Sunday at 12:00 UTC to keep repo active
+    - cron: "0 12 * * 0"
+
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+      - name: Keep repo active
+        run: |
+          git config user.name "Keep Alive Bot"
+          git config user.email "bot@noreply.github.com"
+          echo "Last keepalive: $(date -u)" > keepalive.txt
+          git add keepalive.txt
+          git commit -m "🔄 Keep alive $(date -u +'%Y-%m-%d')" || echo "Nothing to commit"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
