@@ -1,1 +1,70 @@
+name: Combined Paper Trading Bot
+
+on:
+  schedule:
+    # Run at 9:20 AM IST (3:50 UTC) for India markets
+    - cron: "50 3 * * 1-5"
+    # Run at 10:00 AM ET (14:00 UTC) for US markets
+    - cron: "0 14 * * 1-5"
+
+  workflow_dispatch:    # Manual trigger anytime
+
+jobs:
+  run-all-bots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Prepare directories
+        run: mkdir -p logs
+
+      - name: Get current UTC hour
+        id: time
+        run: echo "hour=$(date -u +%H)" >> $GITHUB_OUTPUT
+
+      # Run India bot at 03:50 UTC (9:20 AM IST)
+      - name: Run India Bot (9:20 AM IST)
+        if: steps.time.outputs.hour == '03'
+        run: python india_bot.py
+
+      # Run US bot at 14:00 UTC (10:00 AM ET)
+      - name: Run US Bot (10:00 AM ET)
+        if: steps.time.outputs.hour == '14'
+        run: python trading_bot.py
+
+      # On manual trigger — run BOTH sequentially
+      - name: Run India Bot (Manual)
+        if: github.event_name == 'workflow_dispatch'
+        run: python india_bot.py
+
+      - name: Run US Bot (Manual)
+        if: github.event_name == 'workflow_dispatch'
+        run: python trading_bot.py
+
+      - name: Commit journal and logs
+        run: |
+          git config user.name  "Trading Bot"
+          git config user.email "bot@noreply.github.com"
+          git add trading_journal.xlsx logs/ || true
+          git diff --staged --quiet || git commit -m "📊 Auto-update journal $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
