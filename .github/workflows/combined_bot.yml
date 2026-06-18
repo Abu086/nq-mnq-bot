@@ -1,0 +1,56 @@
+name: Combined Paper Trading Bot
+
+on:
+  schedule:
+    # Run at 9:20 AM IST (3:50 UTC) for India markets
+    - cron: "50 3 * * 1-5"
+    # Run at 10:00 AM ET (14:00 UTC) for US markets
+    - cron: "0 14 * * 1-5"
+
+  workflow_dispatch:    # Manual trigger anytime — always runs BOTH bots
+
+jobs:
+  run-all-bots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Prepare directories
+        run: mkdir -p logs
+
+      # Always run BOTH bots — every scheduled run AND every manual run.
+      # Each bot internally checks if it's a trading day and exits gracefully if not.
+      - name: Run India Bot
+        run: python india_bot.py
+        continue-on-error: true
+
+      - name: Run US Bot
+        run: python trading_bot.py
+        continue-on-error: true
+
+      - name: Commit journal and logs
+        run: |
+          git config user.name  "Trading Bot"
+          git config user.email "bot@noreply.github.com"
+          git add trading_journal.xlsx logs/ || true
+          git diff --staged --quiet || git commit -m "📊 Auto-update journal $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
