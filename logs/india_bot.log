@@ -140,3 +140,69 @@
 [2026-06-15 19:13:38 IST]   ────────────────────────────────────────────────────────────────────────
 [2026-06-15 19:13:38 IST]   TOTAL                                                        ₹  9,873.51
 [2026-06-15 19:13:38 IST] =================================================================
+[2026-06-18 14:44:54 IST] =================================================================
+[2026-06-18 14:44:54 IST]   NIFTY/BANKNIFTY — 4 STRATEGY COMPARISON BOT
+[2026-06-18 14:44:54 IST] =================================================================
+[2026-06-18 14:44:54 IST] 
+───────────────────────────────────────────────────────
+[2026-06-18 14:44:54 IST]   NIFTY
+[2026-06-18 14:44:54 IST] ───────────────────────────────────────────────────────
+[2026-06-18 14:44:54 IST]   Current    : 24,168.00
+[2026-06-18 14:44:54 IST]   Prev Close : 24,085.70
+[2026-06-18 14:44:54 IST]   Trend      : BULLISH  (Price↑(24168.0>24085.7) & EMA9↑(23778.35>23687.38))
+[2026-06-18 14:44:54 IST]   Expiry     : 2026-06-18  DTE: 0
+[2026-06-18 14:44:54 IST] 
+  [Bull Call Spread]
+[2026-06-18 14:44:54 IST]   Outcome: PROFIT  Net: ₹14,492.17
+[2026-06-18 14:44:54 IST] 
+  [Bear Put Spread]
+[2026-06-18 14:44:54 IST]   Outcome: STOP LOSS  Net: ₹-14,621.34
+[2026-06-18 14:44:54 IST] 
+  [Both Spreads]
+[2026-06-18 14:44:54 IST]   Bull Call Spread       Outcome: PROFIT  Net: ₹14,502.67
+[2026-06-18 14:44:54 IST]   Bear Put Spread        Outcome: STOP LOSS  Net: ₹-14,568.07
+[2026-06-18 14:44:54 IST] 
+  [Smart Trend]
+[2026-06-18 14:44:54 IST]   Bull Call Spread       Outcome: PROFIT  Net: ₹14,197.57
+[2026-06-18 14:44:54 IST] 
+───────────────────────────────────────────────────────
+[2026-06-18 14:44:54 IST]   BANKNIFTY
+[2026-06-18 14:44:54 IST] ───────────────────────────────────────────────────────
+[2026-06-18 14:44:55 IST]   Current    : 57,963.80
+[2026-06-18 14:44:55 IST]   Prev Close : 57,585.05
+[2026-06-18 14:44:55 IST]   Trend      : BULLISH  (Price↑(57963.8>57585.05) & EMA9↑(56566.41>55531.65))
+[2026-06-18 14:44:55 IST]   Expiry     : 2026-06-25  DTE: 7
+[2026-06-18 14:44:55 IST] 
+  [Bull Call Spread]
+[2026-06-18 14:44:55 IST]   Outcome: PROFIT  Net: ₹14,508.96
+[2026-06-18 14:44:55 IST] 
+  [Bear Put Spread]
+[2026-06-18 14:44:55 IST]   Outcome: PROFIT  Net: ₹14,250.50
+[2026-06-18 14:44:55 IST] 
+  [Both Spreads]
+[2026-06-18 14:44:55 IST]   Bull Call Spread       Outcome: STOP LOSS  Net: ₹-14,440.34
+[2026-06-18 14:44:55 IST]   Bear Put Spread        Outcome: PROFIT  Net: ₹14,107.77
+[2026-06-18 14:44:55 IST] 
+  [Smart Trend]
+[2026-06-18 14:44:55 IST]   Bull Call Spread       Outcome: PROFIT  Net: ₹14,564.13
+[2026-06-18 14:44:55 IST] 
+✅ Journal saved → trading_journal.xlsx
+[2026-06-18 14:44:55 IST] 
+=================================================================
+[2026-06-18 14:44:55 IST]   SUMMARY — ALL STRATEGIES
+[2026-06-18 14:44:55 IST] =================================================================
+[2026-06-18 14:44:55 IST]   Sheet                     Spread                 Outcome           Net P&L
+[2026-06-18 14:44:55 IST]   ────────────────────────────────────────────────────────────────────────
+[2026-06-18 14:44:55 IST]   NIFTY_BullCall            Bull Call Spread       PROFIT       ₹ 14,492.17
+[2026-06-18 14:44:55 IST]   NIFTY_BearPut             Bear Put Spread        STOP LOSS    ₹-14,621.34
+[2026-06-18 14:44:55 IST]   NIFTY_Both                Bull Call Spread       PROFIT       ₹ 14,502.67
+[2026-06-18 14:44:55 IST]   NIFTY_Both                Bear Put Spread        STOP LOSS    ₹-14,568.07
+[2026-06-18 14:44:55 IST]   NIFTY_Smart               Bull Call Spread       PROFIT       ₹ 14,197.57
+[2026-06-18 14:44:55 IST]   BANKNIFTY_BullCall        Bull Call Spread       PROFIT       ₹ 14,508.96
+[2026-06-18 14:44:55 IST]   BANKNIFTY_BearPut         Bear Put Spread        PROFIT       ₹ 14,250.50
+[2026-06-18 14:44:55 IST]   BANKNIFTY_Both            Bull Call Spread       STOP LOSS    ₹-14,440.34
+[2026-06-18 14:44:55 IST]   BANKNIFTY_Both            Bear Put Spread        PROFIT       ₹ 14,107.77
+[2026-06-18 14:44:55 IST]   BANKNIFTY_Smart           Bull Call Spread       PROFIT       ₹ 14,564.13
+[2026-06-18 14:44:55 IST]   ────────────────────────────────────────────────────────────────────────
+[2026-06-18 14:44:55 IST]   TOTAL                                                        ₹ 56,994.02
+[2026-06-18 14:44:55 IST] =================================================================
