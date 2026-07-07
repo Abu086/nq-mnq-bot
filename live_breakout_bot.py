@@ -95,7 +95,7 @@ def is_trading_day(dt: datetime.date) -> bool:
 def place_order(client, symbol, token, qty, side):
     import urllib.request
     body = {
-        "variety": "NORMAL", "tradingsymbol": symbol, "symboltoken": token,
+        "variety": "NORMAL", "tradingsymbol": symbol + "-EQ", "symboltoken": token,
         "transactiontype": side, "exchange": "NSE", "ordertype": "MARKET",
         "producttype": "INTRADAY", "duration": "DAY",
         "price": "0", "squareoff": "0", "stoploss": "0", "quantity": str(qty),
@@ -351,6 +351,33 @@ def run():
     last_checked    = {}    # symbol → last bar timestamp we checked signals for
     running         = [True]
 
+
+    # ── Pre-load today's candles via Yahoo Finance ────────────────────────
+    log.info("Pre-loading today candles via Yahoo Finance...")
+    import urllib.request as _ur
+    import datetime as _dt
+    _preloaded = 0
+    for _sym in symbols:
+        try:
+            _url = f"https://query1.finance.yahoo.com/v8/finance/chart/{_sym}.NS?interval=15m&range=1d"
+            _req = _ur.Request(_url, headers={"User-Agent": "Mozilla/5.0"})
+            with _ur.urlopen(_req, timeout=10) as _r:
+                _data = json.loads(_r.read())
+            _res = _data["chart"]["result"][0]
+            _ts = _res["timestamp"]
+            _q = _res["indicators"]["quote"][0]
+            for _j, _t in enumerate(_ts):
+                if _q["open"][_j] and _q["high"][_j] and _q["low"][_j] and _q["close"][_j]:
+                    _dt2 = _dt.datetime.fromtimestamp(_t, tz=IST)
+                    with candle_builder.lock:
+                        candle_builder.candles[_sym].append({"timestamp":_dt2,"Open":_q["open"][_j],"High":_q["high"][_j],"Low":_q["low"][_j],"Close":_q["close"][_j],"Volume":_q["volume"][_j] or 0})
+            _preloaded += 1
+        except:
+            pass
+        time.sleep(0.3)
+    log.info(f"Pre-loaded {_preloaded}/{len(symbols)} stocks — signals fire immediately!")
+    # ── End pre-load ──────────────────────────────────────────────────────
+
     # ── WebSocket Setup ───────────────────────────────────────────────────
     from SmartApi.smartWebSocketV2 import SmartWebSocketV2
 
@@ -374,7 +401,7 @@ def run():
     # Reverse map: token → symbol
     token_to_symbol = {token_map[s]: s for s in symbols}
 
-    def on_data(self_ws, wsapp, message):
+    def on_data(wsapp, message):
         """Called for every tick received from WebSocket."""
         try:
             now = datetime.datetime.now(IST)
@@ -504,8 +531,8 @@ def run():
     sws.on_close   = on_close
 
     # Bind on_data as instance method
-    import types
-    sws.on_data = types.MethodType(on_data, sws)
+
+    sws.on_data = on_data
 
     # ── Force exit thread ─────────────────────────────────────────────────
     def force_exit_thread():
