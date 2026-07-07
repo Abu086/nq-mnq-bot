@@ -76,7 +76,7 @@ FORCE_EXIT_TIME  = datetime.time(15, 15)
 ENTRY_START_TIME = datetime.time(10, 0)
 TOKEN_CACHE      = "nifty500_token_cache.json"
 RANKING_CACHE    = "top100_ranking_cache.json"
-TOP_N            = 20   # Use top 20 for WebSocket (well within 1000 limit)
+TOP_N            = 100   # Use top 20 for WebSocket (well within 1000 limit)
 
 INDIA_HOLIDAYS_2026 = {
     datetime.date(2026,  1, 26), datetime.date(2026,  2, 26),
@@ -374,7 +374,7 @@ def run():
     # Reverse map: token → symbol
     token_to_symbol = {token_map[s]: s for s in symbols}
 
-    def on_data(wsapp, message):
+    def on_data(self_ws, wsapp, message):
         """Called for every tick received from WebSocket."""
         try:
             now = datetime.datetime.now(IST)
@@ -503,8 +503,9 @@ def run():
     sws.on_error   = on_error
     sws.on_close   = on_close
 
-    # Override the data handler
-    sws.on_data = on_data
+    # Bind on_data as instance method
+    import types
+    sws.on_data = types.MethodType(on_data, sws)
 
     # ── Force exit thread ─────────────────────────────────────────────────
     def force_exit_thread():
