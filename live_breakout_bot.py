@@ -44,6 +44,7 @@ import pandas as pd
 from angel_one_client import AngelOneClient, _request
 
 # ── Logging ───────────────────────────────────────────────────────────────
+logging.Formatter.converter = lambda *args: datetime.datetime.now(ZoneInfo("Asia/Kolkata")).timetuple()
 os.makedirs("logs", exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
@@ -74,6 +75,7 @@ ROC_MIN          = 0.5
 CANDLE_MINUTES   = 15
 FORCE_EXIT_TIME  = datetime.time(15, 15)
 ENTRY_START_TIME = datetime.time(10, 0)
+ENTRY_END_TIME   = datetime.time(14, 59)
 TOKEN_CACHE      = "nifty500_token_cache.json"
 RANKING_CACHE    = "top100_ranking_cache.json"
 TOP_N            = 100   # Use top 20 for WebSocket (well within 1000 limit)
@@ -118,7 +120,19 @@ def place_order(client, symbol, token, qty, side):
             oid = result["data"]["orderid"]
             log.info(f"✅ {side} {symbol} x{qty} → Order {oid}")
             return oid
-        log.error(f"❌ Order failed: {result.get('message')}")
+        msg = result.get("message", "")
+        if "mismatch" in msg.lower():
+            import time as _t
+            _t.sleep(2)
+            with urllib.request.urlopen(req, timeout=15) as resp2:
+                result2 = json.loads(resp2.read())
+            if result2.get("status"):
+                oid = result2["data"]["orderid"]
+                log.info(f"✅ (retry) {side} {symbol} x{qty} → Order {oid}")
+                return oid
+            log.error(f"Order failed after retry: {result2.get('message')}")
+            return None
+        log.error(f"❌ Order failed: {msg}")
         return None
     except Exception as e:
         log.error(f"❌ Order error: {e}")
@@ -464,8 +478,9 @@ def run():
 
                 # Check for new signals (only after 10 AM, only if slot available)
                 if (now.time() < ENTRY_START_TIME or
+                        now.time() >= ENTRY_END_TIME or
                         symbol in traded_today or
-                        len(open_positions) >= MAX_CONCURRENT):
+                        client.get_available_margin() < BUDGET * MARGIN_MULTIPLE):
                     return
 
                 # Only check at 15-min candle boundaries

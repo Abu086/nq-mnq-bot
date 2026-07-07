@@ -167,6 +167,17 @@ class AngelOneClient:
             return None
         return resp.get("data")
 
+
+    def get_available_margin(self) -> float:
+        """Fetch live available cash/margin from Angel One RMS."""
+        resp = _request("GET", "/rest/secure/angelbroking/user/v1/getRMS",
+                         self._headers(auth=True))
+        if not resp.get("status"):
+            log.warning(f"RMS fetch failed: {resp.get('message')}")
+            return 0.0
+        data = resp.get("data") or {}
+        return float(data.get("availablecash", 0) or 0)
+
     def get_basket_margin(self, positions: list) -> dict | None:
         """
         Calculate the REAL required margin for a basket of positions (e.g. a

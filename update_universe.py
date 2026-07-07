@@ -175,7 +175,9 @@ def update_ranking_cache(symbols: list):
         log.error("❌ No data fetched — ranking cache NOT updated")
         return
 
+    CAUTIONARY_STOCKS = {"BIOCON", "TRENT", "ADANIENT", "INDUSINDBK", "ADANIGREEN"}
     df = pd.DataFrame(rows)
+    df = df[~df["symbol"].isin(CAUTIONARY_STOCKS)]
     top100 = df.nlargest(TOP_N, "traded_value")["symbol"].tolist()
 
     cache = {"date": str(next_day), "symbols": top100}
