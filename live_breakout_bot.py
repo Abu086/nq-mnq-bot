@@ -490,7 +490,7 @@ def run():
         log.info(f"✅ Subscribed to {len(symbols)} stocks")
         log.info(f"  Monitoring | Force exit at {FORCE_EXIT_TIME} IST")
 
-    def on_error(wsapp, error):
+    def on_error(wsapp, *args):
         log.error(f"WebSocket error: {error}")
 
     def on_close(wsapp, *args):
