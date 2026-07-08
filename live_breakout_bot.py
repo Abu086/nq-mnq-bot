@@ -94,6 +94,15 @@ def is_trading_day(dt: datetime.date) -> bool:
     return dt.weekday() < 5 and dt not in INDIA_HOLIDAYS_2026
 
 # ── Order Placement (REST API) ────────────────────────────────────────────
+_margin_cache = {"value": 0.0, "ts": 0}
+
+def _get_cached_margin(client):
+    now_ts = time.time()
+    if now_ts - _margin_cache["ts"] > 30:
+        _margin_cache["value"] = client.get_available_margin()
+        _margin_cache["ts"] = now_ts
+    return _margin_cache["value"]
+
 def place_order(client, symbol, token, qty, side):
     import urllib.request
     body = {
@@ -480,7 +489,7 @@ def run():
                 if (now.time() < ENTRY_START_TIME or
                         now.time() >= ENTRY_END_TIME or
                         symbol in traded_today or
-                        client.get_available_margin() < BUDGET * MARGIN_MULTIPLE):
+                        _get_cached_margin(client) < BUDGET * MARGIN_MULTIPLE):
                     return
 
                 # Only check at 15-min candle boundaries
@@ -498,7 +507,8 @@ def run():
                 if signal is None:
                     return
 
-                direction, entry_price = signal
+                direction, _sig_price = signal
+                entry_price = ltp
                 qty = max(1, int((BUDGET * MARGIN_MULTIPLE) // ltp))
 
                 if direction == "LONG":
