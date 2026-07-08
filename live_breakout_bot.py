@@ -65,7 +65,7 @@ MARGIN_MULTIPLE  = 5
 DAILY_BUDGET     = 84_000
 MAX_CONCURRENT   = int(DAILY_BUDGET // BUDGET)   # 3
 LOOKBACK         = 5
-SL_PCT           = 0.005
+SL_PCT           = 0.010
 TARGET_PCT       = 0.020
 VOL_MULTIPLE     = 1.5
 BREAKOUT_MIN_PCT = 0.3
@@ -330,7 +330,7 @@ def check_signal(df: pd.DataFrame, entry_price_hint: float) -> tuple | None:
 def run():
     log.info("=" * 65)
     log.info("  STRATEGY FOUR LIVE BOT — WEBSOCKET VERSION")
-    log.info(f"  Budget: Rs.{DAILY_BUDGET:,} | Per trade: Rs.{BUDGET:,} | Max: {MAX_CONCURRENT}")
+    log.info(f"  Per trade: Rs.{BUDGET:,} x{MARGIN_MULTIPLE} margin | Max positions: unlimited (live margin check)")
     log.info("=" * 65)
 
     today = datetime.date.today()
@@ -581,7 +581,7 @@ def run():
         while running[0]:
             time.sleep(300)  # Every 5 minutes
             now = datetime.datetime.now(IST)
-            log.info(f"  [{now.strftime('%H:%M')}] Open: {len(open_positions)}/{MAX_CONCURRENT} "
+            log.info(f"  [{now.strftime('%H:%M')}] Open: {len(open_positions)} "
                      f"| Closed: {len(closed_positions)} | P&L: Rs.{daily_pnl_ref[0]:,.2f}")
 
     st = threading.Thread(target=status_thread, daemon=True)
