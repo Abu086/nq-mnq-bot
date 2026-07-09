@@ -48,6 +48,12 @@ def is_india_market_day(dt: datetime.date) -> bool:
 
 def run_background(script: str) -> bool:
     """Launch a script in background — non-blocking."""
+    # Safety: kill any stray/leftover process of this script before launching
+    try:
+        subprocess.run(["pkill", "-9", "-f", script], check=False)
+        time.sleep(2)
+    except Exception:
+        pass
     log.info(f"▶ Launching {script} in background...")
     try:
         proc = subprocess.Popen(

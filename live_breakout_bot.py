@@ -576,6 +576,21 @@ def run():
     exit_thread = threading.Thread(target=force_exit_thread, daemon=True)
     exit_thread.start()
 
+    # -- Token refresh thread (Angel One JWT expires after a few hours) ----
+    def token_refresh_thread():
+        while running[0]:
+            time.sleep(3600)  # every 60 minutes
+            try:
+                if client.login():
+                    log.info("🔄 Session token refreshed")
+                else:
+                    log.error("Token refresh failed")
+            except Exception as e:
+                log.error(f"Token refresh error: {e}")
+
+    refresh_thread = threading.Thread(target=token_refresh_thread, daemon=True)
+    refresh_thread.start()
+
     # ── Status thread ─────────────────────────────────────────────────────
     def status_thread():
         while running[0]:
