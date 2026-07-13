@@ -85,9 +85,9 @@ def main():
             ran_today["strategy_four"]   = None
             ran_today["universe_update"] = None
 
-        # ── 9:20 AM IST — Strategy Four Live Bot ─────────────────────────
+        # ── 11:20 AM IST — Strategy Four Live Bot ─────────────────────────
         if (STRATEGY_FOUR_ENABLED and
-                now_ist.hour > 9 or (now_ist.hour == 9 and now_ist.minute >= 20)) and (
+                now_ist.hour > 11 or (now_ist.hour == 11 and now_ist.minute >= 20)) and (
                 now_ist.hour < 15 and
                 ran_today["strategy_four"] != today and
                 is_india_market_day(today)):
