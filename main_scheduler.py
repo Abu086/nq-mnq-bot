@@ -103,7 +103,7 @@ def main():
         # ── 4:00 PM IST — Universe Updater (after market close) ──────────
         # Downloads latest NIFTY 500 list, ranks by today's traded value,
         # saves top-100 cache for tomorrow — runs every trading day
-        if (now_ist.hour == 16 and now_ist.minute >= 0 and
+        if (now_ist.hour >= 16 and now_ist.hour < 20 and
                 ran_today["universe_update"] != today and
                 is_india_market_day(today)):
 

@@ -103,13 +103,18 @@ def _get_cached_margin(client):
         _margin_cache["ts"] = now_ts
     return _margin_cache["value"]
 
-def place_order(client, symbol, token, qty, side):
+def place_order(client, symbol, token, qty, side, price=0):
     import urllib.request
+    # Use LIMIT order at LTP price — works for cautionary listing stocks too
+    # MARKET orders are rejected for surveillance stocks (Angel One AB4036 error)
+    limit_price = round(price if price else 0, 1)
     body = {
         "variety": "NORMAL", "tradingsymbol": symbol + "-EQ", "symboltoken": token,
-        "transactiontype": side, "exchange": "NSE", "ordertype": "MARKET",
+        "transactiontype": side, "exchange": "NSE",
+        "ordertype": "LIMIT" if limit_price > 0 else "MARKET",
         "producttype": "INTRADAY", "duration": "DAY",
-        "price": "0", "squareoff": "0", "stoploss": "0", "quantity": str(qty),
+        "price": str(limit_price) if limit_price > 0 else "0",
+        "squareoff": "0", "stoploss": "0", "quantity": str(qty),
     }
     headers = {
         "Content-Type": "application/json", "Accept": "application/json",
@@ -119,6 +124,7 @@ def place_order(client, symbol, token, qty, side):
         "X-PrivateKey": os.environ["ANGEL_API_KEY"],
         "Authorization": f"Bearer {client.jwt_token}",
     }
+    log.info(f"ORDER BODY: {body}")
     try:
         url = "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/placeOrder"
         req = urllib.request.Request(url, data=json.dumps(body).encode(),
@@ -374,6 +380,18 @@ def run():
     last_checked    = {}    # symbol → last bar timestamp we checked signals for
     running         = [True]
 
+    # DIAGNOSTIC (added 2026-07-14): zero trades on 2026-07-13 and 07-14
+    # with no errors logged. Leading suspect is the `isinstance(message,
+    # bytes): return` branch in on_data silently dropping every tick if
+    # the installed SmartWebSocketV2 SDK delivers raw bytes instead of a
+    # pre-parsed dict -- that would explain total silence with no errors.
+    # This counter block only adds visibility, it changes no trading
+    # behavior. Remove once the real cause is confirmed and fixed.
+    _tick_diag = {
+        "logged_first": False, "bytes_count": 0, "dict_count": 0,
+        "other_count": 0, "no_symbol_count": 0, "no_ltp_count": 0,
+    }
+
 
     # ── Pre-load today's candles via Yahoo Finance ────────────────────────
     log.info("Pre-loading today candles via Yahoo Finance...")
@@ -429,17 +447,38 @@ def run():
         try:
             now = datetime.datetime.now(IST)
 
+            if not _tick_diag["logged_first"]:
+                _tick_diag["logged_first"] = True
+                log.info(f"DIAG: first WS message type={type(message).__name__} "
+                         f"sample={str(message)[:300]}")
+
+            # DIAGNOSTIC guard (added 2026-07-14): count anything that's
+            # neither bytes nor dict, WITHOUT disturbing the existing
+            # bytes/dict branches or the large block nested inside the
+            # dict branch below (kept at its original indentation on
+            # purpose -- restructuring that block risked a much riskier
+            # edit in live order-placement code).
+            if not isinstance(message, (bytes, dict)):
+                _tick_diag["other_count"] += 1
+                return
+
             # Parse tick data
             if isinstance(message, bytes):
                 # Binary format from SmartWebSocketV2
                 # The SDK parses this automatically in newer versions
+                _tick_diag["bytes_count"] += 1
                 return
             if isinstance(message, dict):
+                _tick_diag["dict_count"] += 1
                 token      = str(message.get("token", ""))
                 ltp        = message.get("last_traded_price", 0) / 100  # paise to rupees
                 volume     = message.get("volume_trade_for_the_day", 0)
                 symbol     = token_to_symbol.get(token)
-                if not symbol or ltp <= 0:
+                if not symbol:
+                    _tick_diag["no_symbol_count"] += 1
+                    return
+                if ltp <= 0:
+                    _tick_diag["no_ltp_count"] += 1
                     return
 
                 # Update candle builder
@@ -468,7 +507,7 @@ def run():
 
                     if exit_reason:
                         side = "SELL" if direction == "LONG" else "BUY"
-                        place_order(client, symbol, token_map[symbol], pos["qty"], side)
+                        place_order(client, symbol, token_map[symbol], pos["qty"], side, price=ltp)
                         exit_price = pos["target"] if "TARGET" in exit_reason else (
                             pos["stop"] if "STOP" in exit_reason else ltp)
                         if direction == "LONG":
@@ -489,7 +528,7 @@ def run():
                 if (now.time() < ENTRY_START_TIME or
                         now.time() >= ENTRY_END_TIME or
                         symbol in traded_today or
-                        _get_cached_margin(client) < BUDGET * MARGIN_MULTIPLE):
+                        _get_cached_margin(client) < BUDGET):
                     return
 
                 # Only check at 15-min candle boundaries
@@ -523,7 +562,7 @@ def run():
                 log.info(f"  🚀 SIGNAL: {symbol} {direction} @ {entry_price} "
                          f"| SL:{stop} | T:{target} | Qty:{qty}")
 
-                order_id = place_order(client, symbol, token_map[symbol], qty, side)
+                order_id = place_order(client, symbol, token_map[symbol], qty, side, price=ltp)
                 if order_id:
                     open_positions[symbol] = {
                         "symbol": symbol, "direction": direction,
@@ -543,7 +582,12 @@ def run():
         log.info(f"  Monitoring | Force exit at {FORCE_EXIT_TIME} IST")
 
     def on_error(wsapp, *args):
-        log.error(f"WebSocket error: {error}")
+        # BUGFIX (2026-07-14): was `log.error(f"WebSocket error: {error}")`
+        # -- referenced an undefined variable `error`, so any actual
+        # websocket error raised a NameError instead of logging it, which
+        # crashed the process (confirmed in last night's 2026-07-14 02:00
+        # IST log: "tearing down on exception name 'error' is not defined").
+        log.error(f"WebSocket error: {args}")
 
     def on_close(wsapp, *args):
         log.info("WebSocket connection closed")
@@ -598,6 +642,9 @@ def run():
             now = datetime.datetime.now(IST)
             log.info(f"  [{now.strftime('%H:%M')}] Open: {len(open_positions)} "
                      f"| Closed: {len(closed_positions)} | P&L: Rs.{daily_pnl_ref[0]:,.2f}")
+            log.info(f"  DIAG ticks: bytes={_tick_diag['bytes_count']} "
+                     f"dict={_tick_diag['dict_count']} other={_tick_diag['other_count']} "
+                     f"no_symbol={_tick_diag['no_symbol_count']} no_ltp={_tick_diag['no_ltp_count']}")
 
     st = threading.Thread(target=status_thread, daemon=True)
     st.start()
