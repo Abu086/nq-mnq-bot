@@ -426,6 +426,16 @@ def run():
     FEED_TOKEN  = client.feed_token
     CLIENT_CODE = os.environ["ANGEL_CLIENT_ID"]
 
+    # Monkey-patch SDK bug: _on_close takes 2 args but gets 4
+    from SmartApi import smartWebSocketV2 as _swsmod
+    _orig_on_close = _swsmod.SmartWebSocketV2._on_close
+    def _patched_on_close(self, *args, **kwargs):
+        try:
+            _orig_on_close(self, args[0] if args else None)
+        except:
+            pass
+    _swsmod.SmartWebSocketV2._on_close = _patched_on_close
+
     sws = SmartWebSocketV2(
         auth_token=AUTH_TOKEN,
         api_key=os.environ["ANGEL_API_KEY"],
