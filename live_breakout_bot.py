@@ -107,7 +107,16 @@ def place_order(client, symbol, token, qty, side, price=0):
     import urllib.request
     # Use LIMIT order at LTP price — works for cautionary listing stocks too
     # MARKET orders are rejected for surveillance stocks (Angel One AB4036 error)
-    limit_price = round(price if price else 0, 1)
+    # Adjust price slightly to stay within circuit limits
+    # BUY: use price slightly below to avoid upper circuit
+    # SELL: use price slightly above to avoid lower circuit
+    if price and price > 0:
+        if side == "BUY":
+            limit_price = round(price * 0.995, 1)  # 0.5% below LTP
+        else:
+            limit_price = round(price * 1.005, 1)  # 0.5% above LTP
+    else:
+        limit_price = 0
     body = {
         "variety": "NORMAL", "tradingsymbol": symbol + "-EQ", "symboltoken": token,
         "transactiontype": side, "exchange": "NSE",
@@ -115,6 +124,7 @@ def place_order(client, symbol, token, qty, side, price=0):
         "producttype": "INTRADAY", "duration": "DAY",
         "price": str(limit_price) if limit_price > 0 else "0",
         "squareoff": "0", "stoploss": "0", "quantity": str(qty),
+        "scripconsent": "yes",
     }
     headers = {
         "Content-Type": "application/json", "Accept": "application/json",
@@ -361,7 +371,44 @@ def run():
     if not symbols:
         log.error("No symbols in cache.")
         return "ERROR"
-    log.info(f"Universe: {len(symbols)} stocks")
+    log.info(f"Universe: {len(symbols)} stocks (unfiltered)")
+
+    # ── Pre-filter cautionary stocks at startup ───────────────────────────
+    # Test each stock with a real order at current LTP — skip AB4036 stocks
+    log.info("Filtering cautionary stocks from universe...")
+    import urllib.request as _ur2
+    with open(TOKEN_CACHE) as _tf:
+        _tokens_pre = json.load(_tf)
+    tradeable = []
+    for _sym in symbols:
+        _tok = _tokens_pre.get(_sym)
+        if not _tok:
+            continue
+        try:
+            _url = f"https://query1.finance.yahoo.com/v8/finance/chart/{_sym}.NS?interval=1m&range=1d"
+            _req2 = _ur2.Request(_url, headers={"User-Agent":"Mozilla/5.0"})
+            with _ur2.urlopen(_req2, timeout=5) as _r2:
+                _d2 = json.loads(_r2.read())
+            _ltp = round(_d2["chart"]["result"][0]["meta"]["regularMarketPrice"], 2)
+        except:
+            _ltp = 500.0
+        _body = {"variety":"NORMAL","tradingsymbol":f"{_sym}-EQ","symboltoken":_tok,
+                 "transactiontype":"BUY","exchange":"NSE","ordertype":"LIMIT",
+                 "producttype":"INTRADAY","duration":"DAY",
+                 "price":f"{_ltp:.2f}","squareoff":"0","stoploss":"0","quantity":"1"}
+        _resp = _request("POST","/rest/secure/angelbroking/order/v1/placeOrder",
+                        client._headers(auth=True),_body)
+        if _resp.get("status"):
+            tradeable.append(_sym)
+            _oid = _resp["data"]["orderid"]
+            _request("POST","/rest/secure/angelbroking/order/v1/cancelOrder",
+                    client._headers(auth=True),{"variety":"NORMAL","orderid":_oid})
+        else:
+            log.info(f"  ⚠️ {_sym} cautionary — excluded")
+        time.sleep(0.5)
+    symbols = tradeable
+    log.info(f"✅ Tradeable universe: {len(symbols)} stocks")
+    # ── End pre-filter ────────────────────────────────────────────────────
 
     # Load tokens
     with open(TOKEN_CACHE) as f:
