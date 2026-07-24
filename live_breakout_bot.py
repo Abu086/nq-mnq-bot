@@ -59,6 +59,22 @@ log = logging.getLogger(__name__)
 
 IST = ZoneInfo("Asia/Kolkata")
 
+TICK_CACHE = "tick_size_cache.json"
+_TICK_MAP = {}
+
+def load_tick_map():
+    global _TICK_MAP
+    try:
+        with open(TICK_CACHE) as f:
+            _TICK_MAP = json.load(f)
+    except Exception:
+        _TICK_MAP = {}
+
+def round_to_tick(price, symbol=None):
+    """Round to the nearest valid NSE tick for this symbol (falls back to Rs.0.05)."""
+    tick = _TICK_MAP.get(symbol, 0.05) if symbol else 0.05
+    return round(round(price / tick) * tick, 2)
+
 # ── Strategy Parameters ───────────────────────────────────────────────────
 BUDGET           = 23_000
 MARGIN_MULTIPLE  = 5
@@ -79,6 +95,10 @@ ENTRY_END_TIME   = datetime.time(14, 59)
 TOKEN_CACHE      = "nifty500_token_cache.json"
 RANKING_CACHE    = "top100_ranking_cache.json"
 TOP_N            = 100   # Use top 20 for WebSocket (well within 1000 limit)
+
+# Directional Control (toggle to pause a side)
+ENABLE_LONG  = False   # 2026-07-21: LONG paused until further notice
+ENABLE_SHORT = True
 
 INDIA_HOLIDAYS_2026 = {
     datetime.date(2026,  1, 26), datetime.date(2026,  2, 26),
@@ -112,9 +132,9 @@ def place_order(client, symbol, token, qty, side, price=0):
     # SELL: use price slightly above to avoid lower circuit
     if price and price > 0:
         if side == "BUY":
-            limit_price = round(price * 0.995, 1)  # 0.5% below LTP
+            limit_price = round_to_tick(price * 0.995, symbol)  # 0.5% below LTP
         else:
-            limit_price = round(price * 1.005, 1)  # 0.5% above LTP
+            limit_price = round_to_tick(price * 0.9985, symbol)  # 0.15% below LTP
     else:
         limit_price = 0
     body = {
@@ -360,6 +380,9 @@ def run():
         log.error("Login failed.")
         return "ERROR"
     log.info("✅ Angel One login successful")
+    load_tick_map()
+    log.info(f"Loaded tick sizes for {len(_TICK_MAP)} symbols" if _TICK_MAP
+             else "⚠️ No tick size cache found -- defaulting all symbols to Rs.0.05")
 
     # Load universe from cache
     if not os.path.exists(RANKING_CACHE):
@@ -373,42 +396,15 @@ def run():
         return "ERROR"
     log.info(f"Universe: {len(symbols)} stocks (unfiltered)")
 
-    # ── Pre-filter cautionary stocks at startup ───────────────────────────
-    # Test each stock with a real order at current LTP — skip AB4036 stocks
-    log.info("Filtering cautionary stocks from universe...")
-    import urllib.request as _ur2
-    with open(TOKEN_CACHE) as _tf:
-        _tokens_pre = json.load(_tf)
-    tradeable = []
-    for _sym in symbols:
-        _tok = _tokens_pre.get(_sym)
-        if not _tok:
-            continue
-        try:
-            _url = f"https://query1.finance.yahoo.com/v8/finance/chart/{_sym}.NS?interval=1m&range=1d"
-            _req2 = _ur2.Request(_url, headers={"User-Agent":"Mozilla/5.0"})
-            with _ur2.urlopen(_req2, timeout=5) as _r2:
-                _d2 = json.loads(_r2.read())
-            _ltp = round(_d2["chart"]["result"][0]["meta"]["regularMarketPrice"], 2)
-        except:
-            _ltp = 500.0
-        _body = {"variety":"NORMAL","tradingsymbol":f"{_sym}-EQ","symboltoken":_tok,
-                 "transactiontype":"BUY","exchange":"NSE","ordertype":"LIMIT",
-                 "producttype":"INTRADAY","duration":"DAY",
-                 "price":f"{_ltp:.2f}","squareoff":"0","stoploss":"0","quantity":"1"}
-        _resp = _request("POST","/rest/secure/angelbroking/order/v1/placeOrder",
-                        client._headers(auth=True),_body)
-        if _resp.get("status"):
-            tradeable.append(_sym)
-            _oid = _resp["data"]["orderid"]
-            _request("POST","/rest/secure/angelbroking/order/v1/cancelOrder",
-                    client._headers(auth=True),{"variety":"NORMAL","orderid":_oid})
-        else:
-            log.info(f"  ⚠️ {_sym} cautionary — excluded")
-        time.sleep(0.5)
-    symbols = tradeable
-    log.info(f"✅ Tradeable universe: {len(symbols)} stocks")
-    # ── End pre-filter ────────────────────────────────────────────────────
+    # ── Cautionary handling (2026-07-22): no more daily test orders ───────
+    # place_order() already sends scripconsent:"yes" and already handles a
+    # rejected order gracefully (logs the reason, returns None, no position
+    # opens). So a genuinely blocked stock just fails cleanly the moment a
+    # real signal fires on it, instead of being pre-emptively excluded for
+    # the whole day by a single throwaway morning BUY test. This adapts to
+    # daily-changing cautionary status automatically, with no real orders
+    # placed just to probe tradeability.
+    log.info(f"✅ Tradeable universe: {len(symbols)} stocks (no pre-filter -- per-order rejection handling)")
 
     # Load tokens
     with open(TOKEN_CACHE) as f:
@@ -585,6 +581,7 @@ def run():
                 if (now.time() < ENTRY_START_TIME or
                         now.time() >= ENTRY_END_TIME or
                         symbol in traded_today or
+                        len(open_positions) >= MAX_CONCURRENT or
                         _get_cached_margin(client) < BUDGET):
                     return
 
@@ -604,16 +601,20 @@ def run():
                     return
 
                 direction, _sig_price = signal
+                if direction == "LONG" and not ENABLE_LONG:
+                    return
+                if direction == "SHORT" and not ENABLE_SHORT:
+                    return
                 entry_price = ltp
                 qty = max(1, int((BUDGET * MARGIN_MULTIPLE) // ltp))
 
                 if direction == "LONG":
-                    stop   = round(entry_price * (1 - SL_PCT), 2)
-                    target = round(entry_price * (1 + TARGET_PCT), 2)
+                    stop   = round_to_tick(entry_price * (1 - SL_PCT), symbol)
+                    target = round_to_tick(entry_price * (1 + TARGET_PCT), symbol)
                     side   = "BUY"
                 else:
-                    stop   = round(entry_price * (1 + SL_PCT), 2)
-                    target = round(entry_price * (1 - TARGET_PCT), 2)
+                    stop   = round_to_tick(entry_price * (1 + SL_PCT), symbol)
+                    target = round_to_tick(entry_price * (1 - TARGET_PCT), symbol)
                     side   = "SELL"
 
                 log.info(f"  🚀 SIGNAL: {symbol} {direction} @ {entry_price} "
