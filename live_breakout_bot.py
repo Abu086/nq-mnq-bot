@@ -97,7 +97,7 @@ RANKING_CACHE    = "top100_ranking_cache.json"
 TOP_N            = 100   # Use top 20 for WebSocket (well within 1000 limit)
 
 # Directional Control (toggle to pause a side)
-ENABLE_LONG  = False   # 2026-07-21: LONG paused until further notice
+ENABLE_LONG  = True    # Re-enabled 2026-07-27
 ENABLE_SHORT = True
 
 INDIA_HOLIDAYS_2026 = {
