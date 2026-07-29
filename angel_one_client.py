@@ -173,7 +173,24 @@ class AngelOneClient:
         resp = _request("GET", "/rest/secure/angelbroking/user/v1/getRMS",
                          self._headers(auth=True))
         if not resp.get("status"):
-            log.warning(f"RMS fetch failed: {resp.get('message')}")
+            log.error(f"⚠️ RMS fetch failed: {resp.get('message')} -- "
+                      f"attempting re-login and retry (this blocks ALL entries until resolved)")
+            try:
+                relogin_ok = self.login()
+            except Exception as e:
+                relogin_ok = False
+                log.error(f"Re-login attempt raised an exception: {e}")
+            if relogin_ok:
+                resp = _request("GET", "/rest/secure/angelbroking/user/v1/getRMS",
+                                 self._headers(auth=True))
+                if resp.get("status"):
+                    data = resp.get("data") or {}
+                    log.info("✅ RMS fetch recovered after re-login")
+                    return float(data.get("availablecash", 0) or 0)
+                log.error(f"⚠️ RMS fetch still failing after re-login: {resp.get('message')} -- "
+                          f"trading remains blocked until this clears")
+            else:
+                log.error("⚠️ Re-login failed during RMS retry -- trading remains blocked")
             return 0.0
         data = resp.get("data") or {}
         return float(data.get("availablecash", 0) or 0)
