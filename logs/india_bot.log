@@ -10953,3 +10953,89 @@
 [2026-09-21 19:03:20 IST]   ────────────────────────────────────────────────────────────────────────
 [2026-09-21 19:03:20 IST]   TOTAL                                                        ₹ 28,378.82
 [2026-09-21 19:03:20 IST] =================================================================
+[2026-09-22 08:49:29 IST] =================================================================
+[2026-09-22 08:49:29 IST]   NIFTY/BANKNIFTY — 4 STRATEGY COMPARISON BOT
+[2026-09-22 08:49:29 IST] =================================================================
+[2026-09-22 08:49:30 IST] 
+───────────────────────────────────────────────────────
+[2026-09-22 08:49:30 IST]   NIFTY
+[2026-09-22 08:49:30 IST] ───────────────────────────────────────────────────────
+[2026-09-22 08:49:30 IST]   Current    : 23,383.65
+[2026-09-22 08:49:30 IST]   Prev Close : 23,414.30
+[2026-09-22 08:49:30 IST]   Trend      : BEARISH  (Price↓(23383.65<23414.3) & EMA9↓(23418.57<23685.22))
+[2026-09-22 08:49:30 IST]   Expiry     : 2026-09-24  DTE: 2
+[2026-09-22 08:49:30 IST] 
+  [Bull Call Spread]
+[2026-09-22 08:49:30 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-09-22 08:49:30 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-09-22 08:49:30 IST]   Outcome: FLAT  Net: ₹1,692.34
+[2026-09-22 08:49:30 IST] 
+  [Bear Put Spread]
+[2026-09-22 08:49:30 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-09-22 08:49:30 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-09-22 08:49:30 IST]   Outcome: PROFIT  Net: ₹14,336.25
+[2026-09-22 08:49:30 IST] 
+  [Both Spreads]
+[2026-09-22 08:49:30 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-09-22 08:49:30 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-09-22 08:49:30 IST]   Bull Call Spread       Outcome: PROFIT  Net: ₹14,271.29
+[2026-09-22 08:49:30 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-09-22 08:49:30 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-09-22 08:49:30 IST]   Bear Put Spread        Outcome: FLAT  Net: ₹1,628.76
+[2026-09-22 08:49:30 IST] 
+  [Smart Trend]
+[2026-09-22 08:49:30 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-09-22 08:49:30 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-09-22 08:49:30 IST]   Bear Put Spread        Outcome: FLAT  Net: ₹-1,809.74
+[2026-09-22 08:49:30 IST] 
+───────────────────────────────────────────────────────
+[2026-09-22 08:49:30 IST]   BANKNIFTY
+[2026-09-22 08:49:30 IST] ───────────────────────────────────────────────────────
+[2026-09-22 08:49:30 IST]   Current    : 56,315.25
+[2026-09-22 08:49:30 IST]   Prev Close : 56,470.65
+[2026-09-22 08:49:30 IST]   Trend      : BEARISH  (Price↓(56315.25<56470.65) & EMA9↓(56431.97<56815.99))
+[2026-09-22 08:49:30 IST]   Expiry     : 2026-09-24  DTE: 2
+[2026-09-22 08:49:30 IST] 
+  [Bull Call Spread]
+[2026-09-22 08:49:30 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-09-22 08:49:30 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-09-22 08:49:30 IST]   Outcome: PROFIT  Net: ₹14,297.87
+[2026-09-22 08:49:30 IST] 
+  [Bear Put Spread]
+[2026-09-22 08:49:30 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-09-22 08:49:30 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-09-22 08:49:30 IST]   Outcome: PROFIT  Net: ₹14,251.40
+[2026-09-22 08:49:30 IST] 
+  [Both Spreads]
+[2026-09-22 08:49:30 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-09-22 08:49:30 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-09-22 08:49:30 IST]   Bull Call Spread       Outcome: STOP LOSS  Net: ₹-14,377.91
+[2026-09-22 08:49:30 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-09-22 08:49:30 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-09-22 08:49:30 IST]   Bear Put Spread        Outcome: STOP LOSS  Net: ₹-14,573.61
+[2026-09-22 08:49:30 IST] 
+  [Smart Trend]
+[2026-09-22 08:49:30 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-09-22 08:49:30 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-09-22 08:49:30 IST]   Bear Put Spread        Outcome: PROFIT  Net: ₹14,290.08
+[2026-09-22 08:49:31 IST] 
+✅ Journal saved → trading_journal.xlsx
+[2026-09-22 08:49:31 IST] 
+=================================================================
+[2026-09-22 08:49:31 IST]   SUMMARY — ALL STRATEGIES
+[2026-09-22 08:49:31 IST] =================================================================
+[2026-09-22 08:49:31 IST]   Sheet                     Spread                 Outcome           Net P&L
+[2026-09-22 08:49:31 IST]   ────────────────────────────────────────────────────────────────────────
+[2026-09-22 08:49:31 IST]   NIFTY_BullCall            Bull Call Spread       FLAT         ₹  1,692.34
+[2026-09-22 08:49:31 IST]   NIFTY_BearPut             Bear Put Spread        PROFIT       ₹ 14,336.25
+[2026-09-22 08:49:31 IST]   NIFTY_Both                Bull Call Spread       PROFIT       ₹ 14,271.29
+[2026-09-22 08:49:31 IST]   NIFTY_Both                Bear Put Spread        FLAT         ₹  1,628.76
+[2026-09-22 08:49:31 IST]   NIFTY_Smart               Bear Put Spread        FLAT         ₹ -1,809.74
+[2026-09-22 08:49:31 IST]   BANKNIFTY_BullCall        Bull Call Spread       PROFIT       ₹ 14,297.87
+[2026-09-22 08:49:31 IST]   BANKNIFTY_BearPut         Bear Put Spread        PROFIT       ₹ 14,251.40
+[2026-09-22 08:49:31 IST]   BANKNIFTY_Both            Bull Call Spread       STOP LOSS    ₹-14,377.91
+[2026-09-22 08:49:31 IST]   BANKNIFTY_Both            Bear Put Spread        STOP LOSS    ₹-14,573.61
+[2026-09-22 08:49:31 IST]   BANKNIFTY_Smart           Bear Put Spread        PROFIT       ₹ 14,290.08
+[2026-09-22 08:49:31 IST]   ────────────────────────────────────────────────────────────────────────
+[2026-09-22 08:49:31 IST]   TOTAL                                                        ₹ 44,006.73
+[2026-09-22 08:49:31 IST] =================================================================
