@@ -16345,3 +16345,89 @@
 [2026-11-10 20:42:02 IST]   NIFTY/BANKNIFTY — 4 STRATEGY COMPARISON BOT
 [2026-11-10 20:42:02 IST] =================================================================
 [2026-11-10 20:42:02 IST] 2026-11-10 is not a trading day. Exiting.
+[2026-11-11 11:28:47 IST] =================================================================
+[2026-11-11 11:28:47 IST]   NIFTY/BANKNIFTY — 4 STRATEGY COMPARISON BOT
+[2026-11-11 11:28:47 IST] =================================================================
+[2026-11-11 11:28:48 IST] 
+───────────────────────────────────────────────────────
+[2026-11-11 11:28:48 IST]   NIFTY
+[2026-11-11 11:28:48 IST] ───────────────────────────────────────────────────────
+[2026-11-11 11:28:48 IST]   Current    : 25,255.05
+[2026-11-11 11:28:48 IST]   Prev Close : 25,044.65
+[2026-11-11 11:28:48 IST]   Trend      : BULLISH  (Price↑(25255.05>25044.65) & EMA9↑(24314.68>23623.34))
+[2026-11-11 11:28:48 IST]   Expiry     : 2026-11-12  DTE: 1
+[2026-11-11 11:28:48 IST] 
+  [Bull Call Spread]
+[2026-11-11 11:28:48 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-11-11 11:28:48 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-11-11 11:28:48 IST]   Outcome: PROFIT  Net: ₹14,332.36
+[2026-11-11 11:28:48 IST] 
+  [Bear Put Spread]
+[2026-11-11 11:28:48 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-11-11 11:28:48 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-11-11 11:28:48 IST]   Outcome: FLAT  Net: ₹202.65
+[2026-11-11 11:28:48 IST] 
+  [Both Spreads]
+[2026-11-11 11:28:48 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-11-11 11:28:48 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-11-11 11:28:48 IST]   Bull Call Spread       Outcome: FLAT  Net: ₹1,630.05
+[2026-11-11 11:28:48 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-11-11 11:28:48 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-11-11 11:28:48 IST]   Bear Put Spread        Outcome: STOP LOSS  Net: ₹-14,287.06
+[2026-11-11 11:28:48 IST] 
+  [Smart Trend]
+[2026-11-11 11:28:48 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-11-11 11:28:48 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-11-11 11:28:48 IST]   Bull Call Spread       Outcome: PROFIT  Net: ₹14,349.24
+[2026-11-11 11:28:48 IST] 
+───────────────────────────────────────────────────────
+[2026-11-11 11:28:48 IST]   BANKNIFTY
+[2026-11-11 11:28:48 IST] ───────────────────────────────────────────────────────
+[2026-11-11 11:28:48 IST]   Current    : 60,792.40
+[2026-11-11 11:28:48 IST]   Prev Close : 59,741.25
+[2026-11-11 11:28:48 IST]   Trend      : BULLISH  (Price↑(60792.4>59741.25) & EMA9↑(57766.52>56426.02))
+[2026-11-11 11:28:48 IST]   Expiry     : 2026-11-26  DTE: 15
+[2026-11-11 11:28:48 IST] 
+  [Bull Call Spread]
+[2026-11-11 11:28:48 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-11-11 11:28:48 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-11-11 11:28:48 IST]   Outcome: STOP LOSS  Net: ₹-14,746.51
+[2026-11-11 11:28:48 IST] 
+  [Bear Put Spread]
+[2026-11-11 11:28:48 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-11-11 11:28:48 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-11-11 11:28:48 IST]   Outcome: PROFIT  Net: ₹14,694.26
+[2026-11-11 11:28:48 IST] 
+  [Both Spreads]
+[2026-11-11 11:28:48 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-11-11 11:28:48 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-11-11 11:28:48 IST]   Bull Call Spread       Outcome: PROFIT  Net: ₹14,565.63
+[2026-11-11 11:28:48 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-11-11 11:28:48 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-11-11 11:28:48 IST]   Bear Put Spread        Outcome: PROFIT  Net: ₹14,128.46
+[2026-11-11 11:28:48 IST] 
+  [Smart Trend]
+[2026-11-11 11:28:48 IST] Angel One client init/login failed: 'ANGEL_API_KEY'
+[2026-11-11 11:28:48 IST]   ⚠️  Using SIMULATED premium (Angel One data unavailable)
+[2026-11-11 11:28:48 IST]   Bull Call Spread       Outcome: PROFIT  Net: ₹14,034.01
+[2026-11-11 11:28:49 IST] 
+✅ Journal saved → trading_journal.xlsx
+[2026-11-11 11:28:49 IST] 
+=================================================================
+[2026-11-11 11:28:49 IST]   SUMMARY — ALL STRATEGIES
+[2026-11-11 11:28:49 IST] =================================================================
+[2026-11-11 11:28:49 IST]   Sheet                     Spread                 Outcome           Net P&L
+[2026-11-11 11:28:49 IST]   ────────────────────────────────────────────────────────────────────────
+[2026-11-11 11:28:49 IST]   NIFTY_BullCall            Bull Call Spread       PROFIT       ₹ 14,332.36
+[2026-11-11 11:28:49 IST]   NIFTY_BearPut             Bear Put Spread        FLAT         ₹    202.65
+[2026-11-11 11:28:49 IST]   NIFTY_Both                Bull Call Spread       FLAT         ₹  1,630.05
+[2026-11-11 11:28:49 IST]   NIFTY_Both                Bear Put Spread        STOP LOSS    ₹-14,287.06
+[2026-11-11 11:28:49 IST]   NIFTY_Smart               Bull Call Spread       PROFIT       ₹ 14,349.24
+[2026-11-11 11:28:49 IST]   BANKNIFTY_BullCall        Bull Call Spread       STOP LOSS    ₹-14,746.51
+[2026-11-11 11:28:49 IST]   BANKNIFTY_BearPut         Bear Put Spread        PROFIT       ₹ 14,694.26
+[2026-11-11 11:28:49 IST]   BANKNIFTY_Both            Bull Call Spread       PROFIT       ₹ 14,565.63
+[2026-11-11 11:28:49 IST]   BANKNIFTY_Both            Bear Put Spread        PROFIT       ₹ 14,128.46
+[2026-11-11 11:28:49 IST]   BANKNIFTY_Smart           Bull Call Spread       PROFIT       ₹ 14,034.01
+[2026-11-11 11:28:49 IST]   ────────────────────────────────────────────────────────────────────────
+[2026-11-11 11:28:49 IST]   TOTAL                                                        ₹ 58,903.09
+[2026-11-11 11:28:49 IST] =================================================================
